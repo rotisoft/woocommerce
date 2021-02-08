@@ -1,0 +1,37 @@
+<?php
+
+add_action( 'woocommerce_after_checkout_form', 'bbloomer_disable_shipping_local_pickup' );
+  
+function bbloomer_disable_shipping_local_pickup( $available_gateways ) {
+    
+   // Part 1: Hide shipping based on the static choice @ Cart
+ 
+   $chosen_methods = WC()->session->get( 'chosen_shipping_methods' );
+   $chosen_shipping = $chosen_methods[0];
+   if ( 0 === strpos( $chosen_shipping, 'local_pickup' ) ) {
+   ?>
+      <script type="text/javascript">
+         jQuery('.woocommerce-shipping-fields .shipping_address').fadeOut();
+		 jQuery('#ship-to-different-address').fadeOut();
+      </script>
+   <?php  
+   } 
+ 
+   // Part 2: Hide shipping based on the dynamic choice @ Checkout
+ 
+   ?>
+      <script type="text/javascript">
+         jQuery('form.checkout').on('change','input[name^="shipping_method"]',function() {
+            var val = jQuery( this ).val();
+            if (val.match("^local_pickup")) {
+                     jQuery('.woocommerce-shipping-fields .shipping_address').fadeOut();
+                     jQuery('#ship-to-different-address').fadeOut();
+               } else {
+               jQuery('.woocommerce-shipping-fields .shipping_address').fadeIn();
+               jQuery('#ship-to-different-address').fadeIn();
+            }
+         });
+      </script>
+   <?php
+  
+}
